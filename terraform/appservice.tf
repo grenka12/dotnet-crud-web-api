@@ -20,10 +20,9 @@ site_config {
     docker_registry_password = azurerm_container_registry.acr_main.admin_password
   }
 }
-
-
   app_settings = {
     "WEBSITES_PORT" = "8080"
     "ASPNETCORE_ENVIRONMENT" = "Development"
   }
+  
 }
