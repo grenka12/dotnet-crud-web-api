@@ -1,7 +1,5 @@
 trigger:
-  branches:
-    include:
-      - main
+- main
 
 pr: none
 
@@ -38,7 +36,7 @@ steps:
     provider: azurerm
     command: plan
     workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-    environmentServiceNameAzureRM: azure-service-connection
+    environmentServiceNameAzureRM: 'Azure for Students(9eb5184c-5f9e-4785-99c3-744581f619cf)'
 
 - task: TerraformTask@5
   displayName: Terraform Apply
@@ -46,5 +44,5 @@ steps:
     provider: azurerm
     command: apply
     workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-    environmentServiceNameAzureRM: azure-service-connection
+    environmentServiceNameAzureRM: 'Azure for Students(9eb5184c-5f9e-4785-99c3-744581f619cf)'
     commandOptions: "-auto-approve"
