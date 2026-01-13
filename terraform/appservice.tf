@@ -16,17 +16,14 @@ site_config {
   application_stack {
     docker_image_name   = "${azurerm_container_registry.acr_main.login_server}/dotnet-crud-api:latest"
     docker_registry_url = "https://${azurerm_container_registry.acr_main.login_server}"
+    docker_registry_server_username = azurerm_container_registry.acr_main.admin_username
+    docker_registry_server_password = azurerm_container_registry.acr_main.admin_password
   }
 }
 
 
   app_settings = {
-    WEBSITES_PORT = "8080"
-
-    DOCKER_REGISTRY_SERVER_URL      = "https://${azurerm_container_registry.acr_main.login_server}"
-    DOCKER_REGISTRY_SERVER_USERNAME = azurerm_container_registry.acr_main.admin_username
-    DOCKER_REGISTRY_SERVER_PASSWORD = azurerm_container_registry.acr_main.admin_password
-
-    ASPNETCORE_ENVIRONMENT = "Development"
+    "WEBSITES_PORT" = "8080"
+    "ASPNETCORE_ENVIRONMENT" = "Development"
   }
 }
