@@ -6,43 +6,101 @@ pr: none
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- checkout: self
+variables:
+  # Azure
+  AZURE_SERVICE_CONNECTION: 'Azure for Students(9eb5184c-5f9e-4785-99c3-744581f619cf)'
 
-- task: TerraformInstaller@1
-  displayName: Install Terraform
-  inputs:
-    terraformVersion: '1.14.3'
+  # Terraform
+  TERRAFORM_DIR: '$(System.DefaultWorkingDirectory)/terraform'
 
-- task: TerraformTask@5
-  inputs:
-    provider: 'azurerm'
-    command: 'init'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-    backendServiceArm: 'Azure for Students(9eb5184c-5f9e-4785-99c3-744581f619cf)'
-    backendAzureRmStorageAccountName: 'dnbackendtf'
-    backendAzureRmContainerName: 'tfstate'
-    backendAzureRmKey: 'app.terraform.tfstate'
+  # ACR
+  ACR_NAME: 'acr-dotnetcrud-bestrong'
+  ACR_LOGIN_SERVER: 'acr-dotnetcrud-bestrong.azurecr.io'
+  IMAGE_NAME: 'dotnet-crud-api'
+  IMAGE_TAG: 'latest'
 
-- task: TerraformTask@5
-  inputs:
-    provider: 'azurerm'
-    command: 'validate'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
+  # App Service
+  WEBAPP_NAME: 'dotnet-crud-main'
 
-- task: TerraformTask@5
-  displayName: Terraform Plan
-  inputs:
-    provider: azurerm
-    command: plan
-    workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-    environmentServiceNameAzureRM: 'Azure for Students(9eb5184c-5f9e-4785-99c3-744581f619cf)'
+stages:
+- stage: Infra
+  displayName: Terraform Infrastructure
+  jobs:
+  - job: Terraform
+    displayName: Terraform Apply
+    steps:
+    - checkout: self
 
-- task: TerraformTask@5
-  displayName: Terraform Apply
-  inputs:
-    provider: azurerm
-    command: apply
-    workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-    environmentServiceNameAzureRM: 'Azure for Students(9eb5184c-5f9e-4785-99c3-744581f619cf)'
-    commandOptions: "-auto-approve"
+    - task: TerraformInstaller@1
+      displayName: Install Terraform
+      inputs:
+        terraformVersion: 1.14.3
+
+    - task: TerraformTask@5
+      displayName: Terraform Init
+      inputs:
+        provider: azurerm
+        command: init
+        workingDirectory: $(TERRAFORM_DIR)
+        backendServiceArm: $(AZURE_SERVICE_CONNECTION)
+        backendAzureRmStorageAccountName: dnbackendtf
+        backendAzureRmContainerName: tfstate
+        backendAzureRmKey: app.terraform.tfstate
+
+    - task: TerraformTask@5
+      displayName: Terraform Validate
+      inputs:
+        provider: azurerm
+        command: validate
+        workingDirectory: $(TERRAFORM_DIR)
+
+    - task: TerraformTask@5
+      displayName: Terraform Plan
+      inputs:
+        provider: azurerm
+        command: plan
+        workingDirectory: $(TERRAFORM_DIR)
+        environmentServiceNameAzureRM: $(AZURE_SERVICE_CONNECTION)
+
+    - task: TerraformTask@5
+      displayName: Terraform Apply
+      inputs:
+        provider: azurerm
+        command: apply
+        workingDirectory: $(TERRAFORM_DIR)
+        environmentServiceNameAzureRM: $(AZURE_SERVICE_CONNECTION)
+        commandOptions: "-auto-approve"
+
+# ---------- STAGE 2: BUILD ----------
+- stage: Build
+  displayName: Build & Push Docker Image
+  dependsOn: Infra
+  jobs:
+  - job: BuildandPush
+    steps:
+      - task: Docker@2
+        displayName: Build & Push Image
+        inputs:
+          containerRegistry: 'DockerRegistryServiceConnection'
+          repository: '$(IMAGE_NAME)'
+          command: 'buildAndPush'
+          Dockerfile: '**/Dockerfile'
+          tags: '$(IMAGE_TAG)'
+
+    
+
+  
+# ---------- STAGE 3: DEPLOY ----------
+- stage: Deploy
+  displayName: Deploy to Azure App Service
+  dependsOn: Build
+  jobs:
+  - job: Deploy
+    displayName: Deploy Container
+    steps:
+    - task: AzureWebAppContainer@1
+      displayName: Deploy to Web App
+      inputs:
+        azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+        appName: '$(WEBAPP_NAME)'
+        containers: '$(ACR_LOGIN_SERVER)/$(IMAGE_NAME):$(IMAGE_TAG)'
