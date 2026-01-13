@@ -14,8 +14,8 @@ variables:
   TERRAFORM_DIR: '$(System.DefaultWorkingDirectory)/terraform'
 
   # ACR
-  ACR_NAME: 'acr-dotnetcrud-bestrong'
-  ACR_LOGIN_SERVER: 'acr-dotnetcrud-bestrong.azurecr.io'
+  ACR_NAME: 'acrdotnetcrudbestrong'
+  ACR_LOGIN_SERVER: 'acrdotnetcrudbestrong.azurecr.io'
   IMAGE_NAME: 'dotnet-crud-api'
   IMAGE_TAG: 'latest'
 
