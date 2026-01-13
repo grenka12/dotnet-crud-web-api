@@ -9,8 +9,8 @@ resource "azurerm_service_plan" "sp_dotnet_app" {
 resource "azurerm_linux_web_app" "app" {
   name                = "dotnet-crud-main"
   resource_group_name = azurerm_resource_group.rg_main.name
-  location            = azurerm_service_plan.plan.location
-  service_plan_id     = azurerm_service_plan.plan.id
+  location            = azurerm_service_plan.sp_dotnet_app.location
+  service_plan_id     = azurerm_service_plan.sp_dotnet_app.id
 
   site_config {
     application_stack {
