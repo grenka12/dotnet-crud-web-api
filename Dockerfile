@@ -26,7 +26,7 @@ EXPOSE 8080
 
 COPY --from=build /out .
 
-RUN mkdir -p /app/Data && chmod 777 /app/Data
+RUN mkdir -p /app/data && chmod 777 /app/data
 
 
 ENTRYPOINT ["/bin/sh", "-c", "./efbundle && dotnet DotNetCrudWebApi.dll"]
