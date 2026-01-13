@@ -12,13 +12,13 @@ resource "azurerm_linux_web_app" "app" {
   location            = azurerm_service_plan.sp_dotnet_app.location
   service_plan_id     = azurerm_service_plan.sp_dotnet_app.id
 
-  site_config {
-    application_stack {
-      docker_image_name = "dotnet-crud-api"
-      docker_image_tag  = "latest"
-      docker_registry_url = azurerm_container_registry.acr_main.login_server
-    }
+site_config {
+  application_stack {
+    docker_image_name   = "${azurerm_container_registry.acr_main.login_server}/dotnet-crud-api:latest"
+    docker_registry_url = "https://${azurerm_container_registry.acr_main.login_server}"
   }
+}
+
 
   app_settings = {
     WEBSITES_PORT = "8080"
