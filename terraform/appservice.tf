@@ -16,8 +16,8 @@ site_config {
   application_stack {
     docker_image_name   = "${azurerm_container_registry.acr_main.login_server}/dotnet-crud-api:latest"
     docker_registry_url = "https://${azurerm_container_registry.acr_main.login_server}"
-    docker_registry_server_username = azurerm_container_registry.acr_main.admin_username
-    docker_registry_server_password = azurerm_container_registry.acr_main.admin_password
+    docker_registry_username = azurerm_container_registry.acr_main.admin_username
+    docker_registry_password = azurerm_container_registry.acr_main.admin_password
   }
 }
 
