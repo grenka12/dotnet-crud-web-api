@@ -16,5 +16,3 @@ resource "azurerm_resource_group" "rg_main" {
   name     = "dotnet-rg"
   location = "Poland Central"
 }
-
-te
