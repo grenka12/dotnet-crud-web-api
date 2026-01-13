@@ -1,26 +1,28 @@
-# -------- BUILD --------
+# BUILD
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 COPY . .
 RUN dotnet restore
 
-# EF тільки для збірки
+# EF 
 RUN dotnet tool install --global dotnet-ef --version 8.0.2
 ENV PATH="$PATH:/root/.dotnet/tools"
 
-# зібрати міграції в bundle
-RUN dotnet ef migrations bundle -o /out/efbundle
+# bundle
+RUN dotnet ef migrations bundle \
+--project DotNetCrudWebApi/DotNetCrudWebApi.csproj \
+ -o /out/efbundle
 
-# зібрати апку
+# publish
 RUN dotnet publish -c Release -o /out
 
 
-# -------- RUNTIME --------
+# RUNTIME
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 
-EXPOSE 5000
+EXPOSE 8080
 
 COPY --from=build /out .
 
