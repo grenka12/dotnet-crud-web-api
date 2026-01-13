@@ -12,5 +12,19 @@ resource "azurerm_linux_web_app" "wa-main-dotnet" {
   location            = azurerm_service_plan.sp_dotnet_app.location
   service_plan_id     = azurerm_service_plan.sp_dotnet_app.id
 
-  site_config {}
+  site_config {
+    application_stack {
+      docker_image     = "${azurerm_container_registry.acr_main.login_server}/dotnet-crud-api"
+      docker_image_tag = "latest"
+    }
+  }
+
+  app_settings = {
+    WEBSITES_PORT = "8080"
+
+    DOCKER_REGISTRY_SERVER_URL      = "https://${azurerm_container_registry.acr_main.login_server}"
+    DOCKER_REGISTRY_SERVER_USERNAME = azurerm_container_registry.acr_main.admin_username
+    DOCKER_REGISTRY_SERVER_PASSWORD = azurerm_container_registry.acr_main.admin_password
+  }
+
 }
