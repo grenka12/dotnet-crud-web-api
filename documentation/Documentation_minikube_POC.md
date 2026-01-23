@@ -29,7 +29,7 @@ Verify:
 
 ##### 3.2.1 Obtain ACR Credentials
 ACR credentials can be retrieved from Azure Portal:
-- Go to **Azure Container Registry**
+- Go to **Azure Container Registry** -> **Settings** -> **Access keys**
 - Copy **username** and **password**
 
 !OR via Azure CLI:
