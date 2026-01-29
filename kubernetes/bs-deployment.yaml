@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dotnet-crud-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dotnet-crud-api
+  template:
+    metadata:
+      labels:
+        app: dotnet-crud-api
+    spec:
+      imagePullSecrets:
+        - name: acr-secret
+      containers:
+        - name: dotnet-crud-api
+          image: acrdotnetcrudbestrong.azurecr.io/dotnet-crud-api:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
+          volumeMounts:
+            - name: sqlite-storage
+              mountPath: /app/data
+      volumes:
+        - name: sqlite-storage
+          persistentVolumeClaim:
+            claimName: sqlite-pvc
