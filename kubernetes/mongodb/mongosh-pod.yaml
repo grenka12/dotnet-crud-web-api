@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mongosh-client
+  namespace: mongodb
+spec:
+  restartPolicy: Never
+  containers:
+    - name: mongosh
+      image: mongo:6.0
+      command: ["sleep", "infinity"]
